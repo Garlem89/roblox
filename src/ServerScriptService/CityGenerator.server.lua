@@ -27,14 +27,4 @@ for x = -240, 240, 120 do
 	end
 end
 
-for _, pos in ipairs({
-	Vector3.new(-20,3,-20), Vector3.new(20,3,20),
-	Vector3.new(-20,3,20), Vector3.new(20,3,-20)
-}) do
-	local s = Instance.new("SpawnLocation")
-	s.Size = Vector3.new(8,1,8)
-	s.Position = pos
-	s.Anchored = true
-	s.Neutral = true
-	s.Parent = city
-end
+-- MatchService creates and assigns mode-specific spawn locations.

@@ -1,7 +1,6 @@
 {
   "className": "Tool",
   "properties": {
-    "Name": "Rifle",
     "RequiresHandle": false,
     "CanBeDropped": false
   }
