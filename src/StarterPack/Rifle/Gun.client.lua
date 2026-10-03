@@ -2,35 +2,23 @@ local tool = script.Parent
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local UserInputService = game:GetService("UserInputService")
-
 local player = Players.LocalPlayer
-local fireRemote = ReplicatedStorage:WaitForChild("OneTapRemotes"):WaitForChild("FireWeapon")
-local ammo = 30
-local reloading = false
+local remotes = ReplicatedStorage:WaitForChild("OneTapRemotes")
+local config = require(ReplicatedStorage:WaitForChild("WeaponConfig")).Rifle
 local last = 0
 
-local function fire()
-	if reloading or ammo <= 0 or os.clock() - last < 0.12 then return end
-	last = os.clock()
-	ammo -= 1
-	tool:SetAttribute("Ammo", ammo)
+tool.Activated:Connect(function()
+	if tool.Parent ~= player.Character or tool:GetAttribute("Reloading")
+		or (tool:GetAttribute("Ammo") or config.Magazine) <= 0
+		or os.clock() - last < config.FireRate then return end
 	local camera = workspace.CurrentCamera
-	fireRemote:FireServer(camera.CFrame.Position, camera.CFrame.LookVector)
-end
-
-tool.Activated:Connect(fire)
-
-UserInputService.InputBegan:Connect(function(input, processed)
-	if processed or tool.Parent ~= player.Character then return end
-	if input.KeyCode == Enum.KeyCode.R and not reloading and ammo < 30 then
-		reloading = true
-		tool:SetAttribute("Reloading", true)
-		task.wait(1.8)
-		ammo = 30
-		tool:SetAttribute("Ammo", ammo)
-		tool:SetAttribute("Reloading", false)
-		reloading = false
-	end
+	if not camera then return end
+	last = os.clock()
+	remotes.FireWeapon:FireServer(camera.CFrame.Position, camera.CFrame.LookVector)
 end)
 
-tool:SetAttribute("Ammo", ammo)
+UserInputService.InputBegan:Connect(function(input, processed)
+	if not processed and tool.Parent == player.Character and input.KeyCode == Enum.KeyCode.R then
+		remotes.ReloadWeapon:FireServer()
+	end
+end)
